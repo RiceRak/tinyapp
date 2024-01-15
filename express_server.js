@@ -9,6 +9,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -20,6 +21,13 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/urls/:id", (req, res) => {
+  const shortURL = req.params.id
+  const longURL = urlDatabase[req.params.id]
+  const templateVars = { id: shortURL, longURL };
+  res.render("urls_show", templateVars);
 });
 
 app.get("/hello", (req, res) => {
