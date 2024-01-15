@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/RiceRak/tinyapp/issues"
   },
-  "homepage": "https://github.com/RiceRak/tinyapp#readme"
+  "homepage": "https://github.com/RiceRak/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
