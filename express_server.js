@@ -49,9 +49,15 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id
-  const longURL = urlDatabase[req.params.id]
+  const longURL = urlDatabase[shortURL]
   const templateVars = { id: shortURL, longURL };
   res.render("urls_show", templateVars);
+});
+
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id
+  const longURL = urlDatabase[shortURL]
+  res.redirect(longURL);
 });
 
 app.get("/hello", (req, res) => {
