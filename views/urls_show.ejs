@@ -23,12 +23,12 @@
       </div>
       <div class="card-footer text-muted">
         <h5 class="card-title">Edit</h5>
-        <form class="form-center" action="/urls" method="POST">
+        <form class="form-center" action="/urls/<%= id %>" method="POST">
           <label for="Edit LongURL">New URL:
             <input
             class="form-center"
             type="text"
-            name="EditURL"
+            name="longURL"
             placeholder="New URL Here"
             style="width: 200px; margin: 1"
           />
