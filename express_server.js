@@ -47,6 +47,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`); // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+});
+
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id
   const longURL = urlDatabase[shortURL]
