@@ -18,15 +18,8 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <% if(!user) { %>
-      <form class="Login" action="/login" method="POST">
-          <input
-          type="text"
-          name="user"
-          placeholder="Username"
-          style="width: 150px; margin: 1"
-        />
-        <button type="submit" class="btn btn-primary">Login</button>
-        </form>
+        <a class="btn btn-primary" href="/login">Login</a>
+        <a class="btn btn-primary" href="/register">Register</a>
           <% } else { %>  
           <form action="/logout" method="post">
             <span>Logged in as: <%= user.email %>!</span>
