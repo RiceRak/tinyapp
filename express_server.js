@@ -95,7 +95,6 @@ app.post("/register", (req, res) => {
   res.redirect("/urls")
 });
 
-
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL
@@ -114,14 +113,17 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
 
+  res.render("login")
+})
 
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id
   const longURL = urlDatabase[shortURL]
   const templateVars = { 
     id: shortURL, longURL,
-    username: req.cookies["users"] };
+    user: req.cookies["users"] };
   res.render("urls_show", templateVars);
 });
 
