@@ -64,9 +64,11 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: req.cookies["users"]
-  }
+  const user = users[req.cookies.user_id]
+  const templateVars = { 
+    urls: urlDatabase,
+    user,
+  };
   res.render("urls_new", templateVars);
 });
 
