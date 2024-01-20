@@ -19,6 +19,15 @@ const generateRandomString = function(length) {
 return result;
 };
 
+const getUserByEmail = function(email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return true;
+    }
+  }
+  return false;
+};
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -71,7 +80,10 @@ app.get("/urls/new", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-   return res.send("Please go back and provide email & password")
+    return res.status(400).send('Bad Request - Missing required field');
+  }
+  if (getUserByEmail) {
+    return res.status(400).send('Bad Request - Email already registered');
   }
   const id = generateRandomString(8);
   users[id] = { 
