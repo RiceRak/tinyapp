@@ -1,5 +1,5 @@
 const express = require("express");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -9,14 +9,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const generateRandomString = function(length) {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   let result = "";
 
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     result += characters.charAt(randomIndex);
   }
-return result;
+  return result;
 };
 
 const getUserByEmail = function(email) {
@@ -47,8 +47,8 @@ const users = {
 };
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies.user_id]
-  const templateVars = { 
+  const user = users[req.cookies.user_id];
+  const templateVars = {
     urls: urlDatabase,
     user,
   };
@@ -64,8 +64,8 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies.user_id]
-  const templateVars = { 
+  const user = users[req.cookies.user_id];
+  const templateVars = {
     urls: urlDatabase,
     user,
   };
@@ -73,22 +73,22 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.cookies.user_id]
-  const templateVars = { 
+  const user = users[req.cookies.user_id];
+  const templateVars = {
     urls: urlDatabase,
     user,
-  }
-  res.render("login", templateVars)
-})
+  };
+  res.render("login", templateVars);
+});
 
 app.get("/register", (req, res) => {
-  const user = users[req.cookies.user_id]
-  const templateVars = { 
+  const user = users[req.cookies.user_id];
+  const templateVars = {
     urls: urlDatabase,
     user,
-  }
-  res.render("register", templateVars)
-})
+  };
+  res.render("register", templateVars);
+});
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
@@ -99,18 +99,18 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Bad Request - Email already registered');
   }
   const id = generateRandomString(8);
-  users[id] = { 
+  users[id] = {
     id,
     email,
     password,
-    };
+  };
   res.cookie('user_id', id);
-  res.redirect("/urls")
+  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
-  const longURL = req.body.longURL
+  const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   console.log(req.body);
   res.redirect(`/urls/${shortURL}`);
@@ -121,9 +121,9 @@ app.post("/login", (req, res) => {
   const loggedUser = users[userKey];
   // validate user inputs
   if (!req.body.email || !req.body.password) {
-    return res.send("Please fill out login details")
+    return res.send("Please fill out login details");
   }
-// check that there is a user thats validate in DB
+  //check that there is a user thats validate in DB
   if (loggedUser) {
     // verify passwords match then set cookies
     if (req.body.password === loggedUser.password) {
@@ -133,9 +133,9 @@ app.post("/login", (req, res) => {
     } else {
       return res.status(403).send('Either E-mail or Password does not match');
     }
-  } 
-// if no user found, return error
-    return res.status(401).send('Email Not Found');
+  }
+  // if no user found, return error
+  return res.status(401).send('Email Not Found');
 });
 
 app.post("/logout", (req, res) => {
@@ -145,21 +145,21 @@ app.post("/logout", (req, res) => {
 
 app.get("/login", (req, res) => {
 
-  res.render("login")
-})
+  res.render("login");
+});
 
 app.get("/urls/:id", (req, res) => {
-  const shortURL = req.params.id
-  const longURL = urlDatabase[shortURL]
-  const templateVars = { 
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+  const templateVars = {
     id: shortURL, longURL,
     user: req.cookies["users"] };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
-  const shortURL = req.params.id
-  const longURL = urlDatabase[shortURL]
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
   if (!longURL) {
     return res.send('Short URL does not exist');
   }
