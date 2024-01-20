@@ -28,18 +28,6 @@ const getUserByEmail = function(email) {
   return false;
 };
 
-
-const checkPassword = function(email, password) {
-  for (const userId in users) {
-    if (users[userId].password !== password || users[userId].email !== email) {
-      return false;
-    }
-  }
-  return users[userId];
-};
-
-
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -81,6 +69,7 @@ app.get("/urls/new", (req, res) => {
   }
   res.render("urls_new", templateVars);
 });
+
 app.get("/login", (req, res) => {
   const user = users[req.cookies.user_id]
   const templateVars = { 
@@ -98,7 +87,6 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars)
 })
-
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
@@ -144,7 +132,7 @@ app.post("/login", (req, res) => {
       return res.status(403).send('Either E-mail or Password does not match');
     }
   } 
-//  .  if no user found, return error
+// if no user found, return error
     return res.status(401).send('Email Not Found');
 });
 
