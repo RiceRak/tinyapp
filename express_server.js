@@ -25,10 +25,25 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  j8iKhBnj: {
+    id: "j8iKhBnj",
+    email: "user@email.com",
+    password: "password",
+  },
+  ig7HnF5d: {
+    id: "ig7HnF5d",
+    email: "user2@email.com",
+    password: "2password"
+  },
+};
+
 app.get("/urls", (req, res) => {
+  const user = users[req.cookies.user_id]
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"] };
+    user,
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -47,9 +62,25 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    username: req.cookies["users"]
   }
   res.render("urls_new", templateVars);
+});
+
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+   return res.send("Please go back and provide email & password")
+  }
+  const id = generateRandomString(8);
+  users[id] = { 
+    id,
+    email,
+    password,
+    };
+  res.cookie('user_id', id);
+  res.redirect("/urls")
 });
 
 
@@ -57,8 +88,8 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL
   urlDatabase[shortURL] = longURL;
-  console.log(req.body); // Log the POST request body to the console
-  res.redirect(`/urls/${shortURL}`); // Respond with 'Ok' (we will replace this)
+  console.log(req.body);
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/login", (req, res) => {
@@ -67,16 +98,18 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
+
+
 
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id
   const longURL = urlDatabase[shortURL]
   const templateVars = { 
     id: shortURL, longURL,
-    username: req.cookies["username"] };
+    username: req.cookies["users"] };
   res.render("urls_show", templateVars);
 });
 
