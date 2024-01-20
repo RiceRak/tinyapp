@@ -22,11 +22,22 @@ return result;
 const getUserByEmail = function(email) {
   for (const userId in users) {
     if (users[userId].email === email) {
-      return true;
+      return userId;
     }
   }
   return false;
 };
+
+
+const checkPassword = function(email, password) {
+  for (const userId in users) {
+    if (users[userId].password !== password || users[userId].email !== email) {
+      return false;
+    }
+  }
+  return users[userId];
+};
+
 
 
 const urlDatabase = {
@@ -56,11 +67,6 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/register", (req, res) => {
-  
-  res.render("register")
-});
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -71,10 +77,27 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["users"]
+    user: req.cookies["users"]
   }
   res.render("urls_new", templateVars);
 });
+app.get("/login", (req, res) => {
+  const user = users[req.cookies.user_id]
+  const templateVars = { 
+    urls: urlDatabase,
+    user,
+  }
+  res.render("login", templateVars)
+})
+
+app.get("/register", (req, res) => {
+  const user = users[req.cookies.user_id]
+  const templateVars = { 
+    urls: urlDatabase,
+    user,
+  }
+  res.render("register", templateVars)
+})
 
 
 app.post("/register", (req, res) => {
@@ -104,13 +127,30 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  const userKey = getUserByEmail(req.body.email);
+  const loggedUser = users[userKey];
+  // validate user inputs
+  if (!req.body.email || !req.body.password) {
+    return res.send("Please fill out login details")
+  }
+// check that there is a user thats validate in DB
+  if (loggedUser) {
+    // verify passwords match then set cookies
+    if (req.body.password === loggedUser.password) {
+      res.cookie("user_id", loggedUser.id);
+      return res.redirect("/urls");
+   
+    } else {
+      return res.status(403).send('Either E-mail or Password does not match');
+    }
+  } 
+//  .  if no user found, return error
+    return res.status(401).send('Email Not Found');
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/login", (req, res) => {
