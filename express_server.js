@@ -82,7 +82,7 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Bad Request - Missing required field');
   }
-  if (getUserByEmail) {
+  if (getUserByEmail(email)) {
     return res.status(400).send('Bad Request - Email already registered');
   }
   const id = generateRandomString(8);
