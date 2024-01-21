@@ -78,6 +78,9 @@ app.get("/login", (req, res) => {
     urls: urlDatabase,
     user,
   };
+  if (user) {
+    return res.redirect("/urls");
+  }
   res.render("login", templateVars);
 });
 
@@ -87,6 +90,9 @@ app.get("/register", (req, res) => {
     urls: urlDatabase,
     user,
   };
+  if (user) {
+    return res.redirect("/urls");
+  }
   res.render("register", templateVars);
 });
 
@@ -143,10 +149,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-app.get("/login", (req, res) => {
-
-  res.render("login");
-});
 
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
