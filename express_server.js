@@ -163,16 +163,11 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: shortURL, longURL,
     user: req.cookies["users"] };
-  res.render("urls_show", templateVars);
-});
-
-app.get("/u/:id", (req, res) => {
-  const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
   if (!longURL) {
     return res.send('Short URL does not exist');
-  }
-  res.redirect(longURL);
+  };
+  
+  res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
