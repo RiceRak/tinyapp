@@ -69,7 +69,10 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user,
   };
-  res.render("urls_new", templateVars);
+  if (user) {
+    return res.redirect("urls_new", templateVars)
+  };
+  res.render("login");
 });
 
 app.get("/login", (req, res) => {
@@ -80,7 +83,7 @@ app.get("/login", (req, res) => {
   };
   if (user) {
     return res.redirect("/urls");
-  }
+  };
   res.render("login", templateVars);
 });
 
@@ -92,7 +95,7 @@ app.get("/register", (req, res) => {
   };
   if (user) {
     return res.redirect("/urls");
-  }
+  };
   res.render("register", templateVars);
 });
 
@@ -118,7 +121,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  console.log(req.body);
+  const user = users[req.cookies.user_id];
   res.redirect(`/urls/${shortURL}`);
 });
 
