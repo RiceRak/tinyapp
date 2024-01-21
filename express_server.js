@@ -118,10 +118,14 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  
+  const user = users[req.cookies.user_id];
+  if (!user) {
+   return res.send("<html><body>You must login or register to add shorten a new URL</body></html>\n")
+  }
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  const user = users[req.cookies.user_id];
   res.redirect(`/urls/${shortURL}`);
 });
 
