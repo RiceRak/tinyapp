@@ -35,6 +35,8 @@ const users = {
   },
 };
 
+// GET
+
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   // check if a cookie session is active/user is logged in
@@ -87,6 +89,31 @@ app.get("/register", (req, res) => {
   };
   res.render("register", templateVars);
 });
+
+app.get("/urls/:id", (req, res) => {
+  const user = users[req.session.user_id]
+  const shortURL = req.params.id;
+  const urlSearch = urlDatabase[shortURL];
+  //check if short URL exists
+  if (!urlSearch) {
+    return res.send('Short URL does not exist');
+  };
+  // check if user owns URL
+  const userURLs = helpers.urlsForUser(user.id, urlDatabase);
+  if (!userURLs[shortURL]) {
+    return res.send('You do not have permission to view this URL');
+  };
+  
+  const templateVars = {
+    id: shortURL,
+    longURL: urlSearch.longURL,
+    user,
+  };
+  // show the user their page
+  res.render("urls_show", templateVars);
+});
+
+// POST
 
 app.post("/register", (req, res) => {
   // deconstruct form object
@@ -141,7 +168,7 @@ app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.send("Please fill out login details");
   }
-  // get users id
+  // get users data
   const loggedUser = users[userKey];
   // check that there is a user in user database
   if (loggedUser) {
@@ -164,30 +191,6 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
-});
-
-
-app.get("/urls/:id", (req, res) => {
-  const user = users[req.session.user_id]
-  const shortURL = req.params.id;
-  const urlSearch = urlDatabase[shortURL];
-  //check if short URL exists
-  if (!urlSearch) {
-    return res.send('Short URL does not exist');
-  };
-  // check if user owns URL
-  const userURLs = helpers.urlsForUser(user.id, urlDatabase);
-  if (!userURLs[shortURL]) {
-    return res.send('You do not have permission to view this URL');
-  };
-  
-  const templateVars = {
-    id: shortURL,
-    longURL: urlSearch.longURL,
-    user,
-  };
-  // show the user their page
-  res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
