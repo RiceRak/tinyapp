@@ -1,13 +1,19 @@
 const bcrypt = require("bcryptjs");
 const express = require("express");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const app = express();
 const PORT = 8080;
 
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+
+const cookieSessionConfig = cookieSession({
+  name: 'myCookieSession',
+  keys: ['my-secret-word']
+});
+
+app.use(cookieSessionConfig)
 
 const generateRandomString = function(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -59,7 +65,7 @@ const users = {
 };
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   if (!user) {
     return res.redirect("/login");
   }
@@ -80,7 +86,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const templateVars = {
     urls: urlDatabase,
     user,
@@ -89,7 +95,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const templateVars = {
     user,
   };
@@ -101,7 +107,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const templateVars = {
     urls: urlDatabase,
     user,
@@ -133,12 +139,12 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
   
-  res.cookie('user_id', id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   // Check if user is logged in
   if (!user) {
     return res.status(401).send("Unauthorized: Please log in to create URL's");
@@ -171,8 +177,8 @@ app.post("/login", (req, res) => {
   if (loggedUser) {
     // verify passwords match
     if (bcrypt.compareSync(req.body.password, loggedUser.password)) {
-      //set cookies
-      res.cookie("user_id", loggedUser.id);
+      //set encrypted cookie
+      req.session.user_id = loggedUser.id;
       // show the user its URLs
       return res.redirect("/urls");
    
@@ -186,13 +192,13 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/login");
 });
 
 
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.cookies.user_id]
+  const user = users[req.session.user_id]
   const shortURL = req.params.id;
   const urlSearch = urlDatabase[shortURL];
   //check if short URL exists
@@ -217,7 +223,7 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
   // check if user is logged in
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   if (!user) {
     return res.status(401).send("Unauthorized: Please log in to delete URLs.");
   }
@@ -234,7 +240,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id/", (req, res) => {
   // check if user is logged in
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
 
   if (!user) {
     return res.status(401).send("Unauthorized: Please log in to edit URLs.");
