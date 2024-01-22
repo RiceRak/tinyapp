@@ -28,6 +28,16 @@ const getUserByEmail = function(email) {
   return false;
 };
 
+const urlsForUser = function(id) {
+  const userURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userURLs;
+}
+
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -49,9 +59,13 @@ const users = {
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies.user_id];
+  if (!user) {
+    return res.render("login");
+  }
+
   const templateVars = {
-    urls: urlDatabase,
     user,
+    urlsForUser,
   };
   res.render("urls_index", templateVars);
 });
