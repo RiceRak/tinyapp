@@ -133,7 +133,7 @@ app.post("/urls", (req, res) => {
   const user = users[req.cookies.user_id];
   // Check if user is logged in
   if (!user) {
-    return res.send("<html><body>You must log in or register to shorten a new URL</body></html>\n");
+    return res.status(401).send("Unauthorized: Please log in to create URL's");
   }
   // If user is logged in, check if form is filled
   const longURL = req.body.longURL;
@@ -165,11 +165,11 @@ app.post("/login", (req, res) => {
       return res.redirect("/urls");
    
     } else {
-      return res.status(403).send('Either E-mail or Password does not match');
+      return res.status(403).send('Forbidden: Either E-mail or Password does not match');
     }
   }
   // if no user found, return error
-  return res.status(401).send('Email Not Found');
+  return res.status(401).send('Unauthorized: Email Not Found');
 });
 
 app.post("/logout", (req, res) => {
@@ -186,26 +186,57 @@ app.get("/urls/:id", (req, res) => {
   if (!urlSearch) {
     return res.send('Short URL does not exist');
   };
+  // check if user owns URL
+  const userURLs = urlsForUser(user.id);
+  if (!userURLs[shortURL]) {
+    return res.send('You do not have permission to view this URL');
+  };
   
   const templateVars = {
     id: shortURL,
     longURL: urlSearch.longURL,
     user,
   };
-  
+  // show the user thier page
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
+  // check if user is logged in
+  const user = users[req.cookies.user_id];
+  if (!user) {
+    return res.status(401).send("Unauthorized: Please log in to delete URLs.");
+  }
+  // check if user owns URL
+  const urlSearch = urlDatabase[shortURL];
+
+  if (!urlSearch || urlSearch.userID !== user.id) {
+    return res.status(403).send("Forbidden: You do not have permission to delete this URL.");
+  }
+  // delete if requirements met
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
 app.post("/urls/:id/", (req, res) => {
+  // check if user is logged in
+  const user = users[req.cookies.user_id];
+  
+  if (!user) {
+    return res.status(401).send("Unauthorized: Please log in to edit URLs.");
+  }
+
+  // check if user owns URL
+  const urlSearch = urlDatabase[shortURL];
+  if (!urlSearch || urlSearch.userID !== user.id) {
+    return res.status(403).send("Forbidden: You do not have permission to edit this URL.");
+  }
+
+  //check if short URL exists
   const shortURL = req.params.id;
   const newlongURL = req.body.editURL;
-  //check if short URL exists
+  
   if (!urlDatabase[shortURL]) {
     return res.send("Short URL not found");
   }
