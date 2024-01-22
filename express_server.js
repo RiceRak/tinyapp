@@ -115,8 +115,6 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   // deconstruct form object
   const { email, password, } = req.body;
-  // compare plain text password to hashed password
-  const hashedPassword = bcrypt.hashSync(password, 10);
   // make sure fields are filled out
   if (!email || !password) {
     return res.status(400).send('Bad Request - Missing required field');
@@ -125,6 +123,8 @@ app.post("/register", (req, res) => {
   if (getUserByEmail(email)) {
     return res.status(400).send('Bad Request - Email already registered');
   }
+  // compare the hashed password
+  const hashedPassword = bcrypt.hashSync(password, 10);
   // create new user
   const id = generateRandomString(8);
   users[id] = {
