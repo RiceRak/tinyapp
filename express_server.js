@@ -29,8 +29,14 @@ const getUserByEmail = function(email) {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "j8iKhBnj",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "j8iKhBnj",
+  },
 };
 
 const users = {
@@ -38,11 +44,6 @@ const users = {
     id: "j8iKhBnj",
     email: "user@email.com",
     password: "password",
-  },
-  ig7HnF5d: {
-    id: "ig7HnF5d",
-    email: "user2@email.com",
-    password: "2password"
   },
 };
 
@@ -70,7 +71,7 @@ app.get("/urls/new", (req, res) => {
     user,
   };
   if (user) {
-    return res.redirect("urls_new", templateVars)
+    return res.render("urls_new", templateVars)
   };
   res.render("login");
 });
@@ -118,14 +119,23 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  
   const user = users[req.cookies.user_id];
+  // Check if user is logged in
   if (!user) {
-   return res.send("<html><body>You must login or register to add shorten a new URL</body></html>\n")
+    return res.send("<html><body>You must log in or register to shorten a new URL</body></html>\n");
   }
-  const shortURL = generateRandomString(6);
+  // If user is logged in, check if form is filled
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  if (!longURL) {
+    res.send("Please enter the webpage you would like to shorten")
+  }
+  // Update the URL entry in the database
+  const shortURL = generateRandomString(6);
+  urlDatabase[shortURL] = {
+    longURL: longURL,
+    userID: user.id,
+  };
+
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -158,13 +168,18 @@ app.post("/logout", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
+  const user = users[req.cookies.user_id]
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
-  const templateVars = {
-    id: shortURL, longURL,
-    user: req.cookies["users"] };
-  if (!longURL) {
+  const urlSearch = urlDatabase[shortURL];
+  //check if short URL exists
+  if (!urlSearch) {
     return res.send('Short URL does not exist');
+  };
+  
+  const templateVars = {
+    id: shortURL,
+    longURL: urlSearch.longURL,
+    user,
   };
   
   res.render("urls_show", templateVars);
@@ -178,11 +193,14 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id/", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = req.body.editURL;
-
-  urlDatabase[shortURL] = longURL;
-  
-  res.redirect("/urls");
+  const newlongURL = req.body.editURL;
+  //check if short URL exists
+  if (!urlDatabase[shortURL]) {
+    return res.send("Short URL not found");
+  }
+  //update database
+  urlDatabase[shortURL].longURL = newLongURL;
+    res.redirect("/urls");
 });
 
 app.get("/hello", (req, res) => {
