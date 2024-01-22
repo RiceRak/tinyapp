@@ -70,10 +70,7 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user,
   };
-  if (user) {
-    return res.render("urls_new", templateVars)
-  };
-  res.render("login");
+  res.render("urls_new", templateVars);
 });
 
 app.get("/login", (req, res) => {
