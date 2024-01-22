@@ -90,12 +90,12 @@ app.get("/urls/new", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.cookies.user_id];
   const templateVars = {
-    urls: urlDatabase,
     user,
   };
   if (user) {
     return res.redirect("/urls");
   };
+
   res.render("login", templateVars);
 });
 
