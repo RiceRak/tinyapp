@@ -113,19 +113,26 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const { email, password } = req.body;
+  // deconstruct form object
+  const { email, password, } = req.body;
+  // compare plain text password to hashed password
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  // make sure fields are filled out
   if (!email || !password) {
     return res.status(400).send('Bad Request - Missing required field');
   }
+  // compare input email to existing user database
   if (getUserByEmail(email)) {
     return res.status(400).send('Bad Request - Email already registered');
   }
+  // create new user
   const id = generateRandomString(8);
   users[id] = {
     id,
     email,
-    password,
+    hashedPassword,
   };
+  
   res.cookie('user_id', id);
   res.redirect("/urls");
 });
@@ -152,21 +159,26 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  // get user email with getUserByEmail function call
   const userKey = getUserByEmail(req.body.email);
-  const loggedUser = users[userKey];
   // validate user inputs
   if (!req.body.email || !req.body.password) {
     return res.send("Please fill out login details");
   }
+  // get users id
+  const loggedUser = users[userKey];
   //check that there is a user thats validate in DB
   if (loggedUser) {
-    // verify passwords match then set cookies
-    if (req.body.password === loggedUser.password) {
+    // verify passwords match
+    if (bcrypt.compareSync(req.body.password, loggedUser.hashedPassword)) {
+      //set cookies
       res.cookie("user_id", loggedUser.id);
+      // show the user its URLs
       return res.redirect("/urls");
    
     } else {
-      return res.status(403).send('Forbidden: Either E-mail or Password does not match');
+      // if user id does not exist in database
+      return res.status(403).send('Forbidden: Email/Passwords do not match');
     }
   }
   // if no user found, return error
