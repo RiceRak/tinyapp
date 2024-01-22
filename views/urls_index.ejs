@@ -33,11 +33,10 @@
           </tr>
         </thead>
         <tbody>
-          <% const userURLs = urlsForUser(user.id); %>
-          <% for (let id in userURLs) { %>
+          <% for (let id in urlsForUser) { %>
             <tr>
               <td><%= id %></td>
-              <td><%= userURLs[id].longURL %></td>
+              <td><%= urlsForUser[id].longURL %></td>
               <td><form method="GET" action="/urls/<%= id %>">
                  <button type="submit" class="btn btn-success" value="Go to edit specific URL">Edit</button>
                 </div>

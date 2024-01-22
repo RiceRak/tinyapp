@@ -1,3 +1,4 @@
+const helpers = require("./helpers")
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const cookieSession = require("cookie-session");
@@ -14,36 +15,6 @@ const cookieSessionConfig = cookieSession({
 });
 
 app.use(cookieSessionConfig)
-
-const generateRandomString = function(length) {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomIndex);
-  }
-  return result;
-};
-
-const getUserByEmail = function(email) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return userId;
-    }
-  }
-  return false;
-};
-
-const urlsForUser = function(id) {
-  const userURLs = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userURLs[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userURLs;
-}
 
 const urlDatabase = {
   b6UTxQ: {
@@ -66,23 +37,17 @@ const users = {
 
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
+  // check if a cookie session is active/user is logged in
   if (!user) {
     return res.redirect("/login");
   }
-
+  // if user is logged in, pass 'urls_index' data to render
+  const urlsForUser = helpers.urlsForUser(user.id, urlDatabase);
   const templateVars = {
     user,
     urlsForUser,
   };
   res.render("urls_index", templateVars);
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -95,25 +60,30 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  // check if a cookie session is active/user is logged in 
   const user = users[req.session.user_id];
-  const templateVars = {
-    user,
-  };
+  // if user is logged in, redirect to their URL's
   if (user) {
     return res.redirect("/urls");
   };
-
+  // if user is not logged in, render the login page
+  const templateVars = {
+    user,
+  };
   res.render("login", templateVars);
 });
 
 app.get("/register", (req, res) => {
+  // check if a cookie session is active/user is logged in
   const user = users[req.session.user_id];
+  // if user is logged in, redirect to their URL's
+  if (user) {
+    return res.redirect("/urls");
+  };
+  // if user is not logged in, render the registration page
   const templateVars = {
     urls: urlDatabase,
     user,
-  };
-  if (user) {
-    return res.redirect("/urls");
   };
   res.render("register", templateVars);
 });
@@ -126,19 +96,19 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Bad Request - Missing required field');
   }
   // compare input email to existing user database
-  if (getUserByEmail(email)) {
+  if (helpers.getUserByEmail(email, users)) {
     return res.status(400).send('Bad Request - Email already registered');
   }
   // compare the hashed password
   const hashedPassword = bcrypt.hashSync(password, 10);
   // create new user
-  const id = generateRandomString(8);
+  const id = helpers.generateRandomString(8);
   users[id] = {
     id,
     email,
     password: hashedPassword
   };
-  
+  // start a cookie session and show the user their URL's
   req.session.user_id = id;
   res.redirect("/urls");
 });
@@ -155,7 +125,7 @@ app.post("/urls", (req, res) => {
     res.send("Please enter the webpage you would like to shorten")
   }
   // Update the URL entry in the database
-  const shortURL = generateRandomString(6);
+  const shortURL = helpers.generateRandomString(6);
   urlDatabase[shortURL] = {
     longURL: longURL,
     userID: user.id,
@@ -166,20 +136,20 @@ app.post("/urls", (req, res) => {
 
 app.post("/login", (req, res) => {
   // get user email with getUserByEmail function call
-  const userKey = getUserByEmail(req.body.email);
+  const userKey = helpers.getUserByEmail(req.body.email, users);
   // validate user inputs
   if (!req.body.email || !req.body.password) {
     return res.send("Please fill out login details");
   }
   // get users id
   const loggedUser = users[userKey];
-  //check that there is a user thats validate in DB
+  // check that there is a user in user database
   if (loggedUser) {
     // verify passwords match
     if (bcrypt.compareSync(req.body.password, loggedUser.password)) {
       //set encrypted cookie
       req.session.user_id = loggedUser.id;
-      // show the user its URLs
+      // show the user their URLs
       return res.redirect("/urls");
    
     } else {
@@ -206,7 +176,7 @@ app.get("/urls/:id", (req, res) => {
     return res.send('Short URL does not exist');
   };
   // check if user owns URL
-  const userURLs = urlsForUser(user.id);
+  const userURLs = helpers.urlsForUser(user.id, urlDatabase);
   if (!userURLs[shortURL]) {
     return res.send('You do not have permission to view this URL');
   };
@@ -216,7 +186,7 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlSearch.longURL,
     user,
   };
-  // show the user thier page
+  // show the user their page
   res.render("urls_show", templateVars);
 });
 
@@ -254,12 +224,11 @@ app.post("/urls/:id/", (req, res) => {
   }
 
   //check if short URL exists
-  const newlongURL = req.body.editURL;
-  
   if (!urlDatabase[shortURL]) {
     return res.send("Short URL not found");
   }
   //update database
+  const newLongURL = req.body.editURL;
   urlDatabase[shortURL].longURL = newLongURL;
     res.redirect("/urls");
 });
