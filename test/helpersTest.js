@@ -18,14 +18,11 @@ const testUsers = {
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = getUserByEmail("user@example.com", testUsers)
-    const expectedUserID = "userRandomID";
-    assert.strictEqual(user, expectedUserID, "The user's ID should match the expected ID.")
+    const expectedUser = testUsers["userRandomID"];
+    assert.deepEqual(user, expectedUser, "The user's ID should match the expected ID.")
   });
-});
-describe('getUserByEmail', function() {
   it('should return false when the email is not in the database', function() {
     const user = getUserByEmail("user3@example.com", testUsers)
-    const expectedUserID = false;
-    assert.strictEqual(user, expectedUserID, "If no match, return false")
+    assert.isFalse(user, "If no match, return false")
   });
 });
