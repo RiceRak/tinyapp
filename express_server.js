@@ -222,19 +222,19 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/", (req, res) => {
   // check if user is logged in
   const user = users[req.cookies.user_id];
-  
+
   if (!user) {
     return res.status(401).send("Unauthorized: Please log in to edit URLs.");
   }
 
   // check if user owns URL
+  const shortURL = req.params.id;
   const urlSearch = urlDatabase[shortURL];
   if (!urlSearch || urlSearch.userID !== user.id) {
     return res.status(403).send("Forbidden: You do not have permission to edit this URL.");
   }
 
   //check if short URL exists
-  const shortURL = req.params.id;
   const newlongURL = req.body.editURL;
   
   if (!urlDatabase[shortURL]) {
