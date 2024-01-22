@@ -130,7 +130,7 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email,
-    hashedPassword,
+    password: hashedPassword
   };
   
   res.cookie('user_id', id);
@@ -170,7 +170,7 @@ app.post("/login", (req, res) => {
   //check that there is a user thats validate in DB
   if (loggedUser) {
     // verify passwords match
-    if (bcrypt.compareSync(req.body.password, loggedUser.hashedPassword)) {
+    if (bcrypt.compareSync(req.body.password, loggedUser.password)) {
       //set cookies
       res.cookie("user_id", loggedUser.id);
       // show the user its URLs
