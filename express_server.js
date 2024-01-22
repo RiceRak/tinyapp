@@ -162,20 +162,20 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  // get user email with getUserByEmail function call
-  const userKey = helpers.getUserByEmail(req.body.email, users);
   // validate user inputs
   if (!req.body.email || !req.body.password) {
     return res.send("Please fill out login details");
   }
+    // get user data object with getUserByEmail function call
+    const userData = helpers.getUserByEmail(req.body.email, users);
   // get users data
-  const loggedUser = users[userKey];
+  const loggedUser = userData.id;
   // check that there is a user in user database
   if (loggedUser) {
     // verify passwords match
-    if (bcrypt.compareSync(req.body.password, loggedUser.password)) {
+    if (bcrypt.compareSync(req.body.password, userData.password)) {
       //set encrypted cookie
-      req.session.user_id = loggedUser.id;
+      req.session.user_id = userData.id;
       // show the user their URLs
       return res.redirect("/urls");
    
