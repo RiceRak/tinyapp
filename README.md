@@ -45,7 +45,7 @@ TinyApp was developed so that I can practice server side creations and implement
 
 PROTIP:
 If you know the ShortURL you can visit the associated webpage directly by entering
-localhost:8080/u/<ShortURL>
+localhost:8080/u/"ShortURL"
 
 ## Testing
 
