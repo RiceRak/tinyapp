@@ -10,12 +10,16 @@ TinyApp was developed so that I can practice server side creations and implement
 ## How to Use/Install
 
 - Clone this repository to your own directory using the command in your terminal.
+
 `git clone git@github.com:RiceRak/tinyapp.git`
 -  After you have cloned this cd into the directory
+
 `cd tinyapp`
 - Install dependencies
+
 `npm install`
 - Start your server
+
 `npm start`
 - You should see that your server is "app listening on port 8080!" (you can set a port that you desire inside the express_server.js file if you wish, default is 8080).
 - Open your browser and visit "http://localhost:8080/register"
