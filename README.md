@@ -47,20 +47,6 @@ PROTIP:
 If you know the ShortURL you can visit the associated webpage directly by entering
 localhost:8080/u/"ShortURL"
 
-## Testing
-
-This API uses the Mocha test framework which can be ran by using the command:
-`npm test`
-Test are located in ./test/helpersTest. Here is an example of the test structure:
-```
-describe('getUserByEmail', function() {
-  it('should return a user with valid email', function() {
-    const user = getUserByEmail("user@example.com", testUsers)
-    const expectedUser = testUsers["userRandomID"];
-    assert.deepEqual(user, expectedUser, "The user's ID should match the expected ID.")
-  });
-});
-```
 ## Acknowledgements
 
 This project was built with heavy guidance from LHL staff!
