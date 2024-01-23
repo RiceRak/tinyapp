@@ -8,13 +8,13 @@ TinyApp was developed so that I can practice server side creations and implement
 
 ## Final Product
 
-![Registration Page](https://postimg.cc/D4Tx477y)
+![Registration Page](https://i.postimg.cc/zvL6MfMW/Registration-Page.jpg)
 
 
-![URL Info](https://postimg.cc/WqwXMx4m)
+![URL Info](https://i.postimg.cc/4yrqTgk0/URL-info.jpg)
 
 
-![URL List](https://postimg.cc/rKqh8yhf)
+![URL List](https://i.postimg.cc/fT91fJYQ/URL-list.jpg)
 
 
 ## Dependencies
