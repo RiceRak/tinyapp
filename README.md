@@ -8,13 +8,13 @@ TinyApp was developed so that I can practice server side creations and implement
 
 ## Final Product
 
-![Registration Page](https://i.postimg.cc/zvL6MfMW/Registration-Page.jpg)
+![Registration Page](https://github.com/RiceRak/tinyapp/blob/master/docs/Registration-Page.png.JPG)
 
 
-![URL Info](https://i.postimg.cc/4yrqTgk0/URL-info.jpg)
+![URL Info](https://github.com/RiceRak/tinyapp/blob/master/docs/URL-info.png.JPG)
 
 
-![URL List](https://i.postimg.cc/fT91fJYQ/URL-list.jpg)
+![URL List](https://github.com/RiceRak/tinyapp/blob/master/docs/URL-list.png.JPG)
 
 
 ## Dependencies
