@@ -30,11 +30,19 @@ TinyApp was developed so that I can practice server side creations and implement
 This API uses the Mocha test framework which can be ran by using the command:
 `npm test`
 Test are located in ./test/helpersTest. Here is an example of the test structure:
-```javascript
+```
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = getUserByEmail("user@example.com", testUsers)
     const expectedUser = testUsers["userRandomID"];
     assert.deepEqual(user, expectedUser, "The user's ID should match the expected ID.")
   });
-});```
+});
+```
+## Acknowledgements
+
+This project was built with heavy guidance from LHL staff!
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
