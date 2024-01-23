@@ -1,4 +1,4 @@
-const helpers = require("./helpers")
+const helpers = require("./helpers");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const cookieSession = require("cookie-session");
@@ -14,7 +14,7 @@ const cookieSessionConfig = cookieSession({
   keys: ['my-secret-word']
 });
 
-app.use(cookieSessionConfig)
+app.use(cookieSessionConfig);
 
 const urlDatabase = {
   b6UTxQ: {
@@ -62,12 +62,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  // check if a cookie session is active/user is logged in 
+  // check if a cookie session is active/user is logged in
   const user = users[req.session.user_id];
   // if user is logged in, redirect to their URL's
   if (user) {
     return res.redirect("/urls");
-  };
+  }
   // if user is not logged in, render the login page
   const templateVars = {
     user,
@@ -81,7 +81,7 @@ app.get("/register", (req, res) => {
   // if user is logged in, redirect to their URL's
   if (user) {
     return res.redirect("/urls");
-  };
+  }
   // if user is not logged in, render the registration page
   const templateVars = {
     urls: urlDatabase,
@@ -91,18 +91,18 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.session.user_id]
+  const user = users[req.session.user_id];
   const shortURL = req.params.id;
   const urlSearch = urlDatabase[shortURL];
   //check if short URL exists
   if (!urlSearch) {
     return res.send('Short URL does not exist');
-  };
+  }
   // check if user owns URL
   const userURLs = helpers.urlsForUser(user.id, urlDatabase);
   if (!userURLs[shortURL]) {
     return res.send('You do not have permission to view this URL');
-  };
+  }
   
   const templateVars = {
     id: shortURL,
@@ -111,6 +111,15 @@ app.get("/urls/:id", (req, res) => {
   };
   // show the user their page
   res.render("urls_show", templateVars);
+});
+
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id
+  const url = urlDatabase[shortURL]
+  if (!url) {
+    return res.send('Short URL does not exist');
+  }
+  res.redirect(url.longURL);
 });
 
 // POST
@@ -136,6 +145,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
   // start a cookie session and show the user their URL's
+
   req.session.user_id = id;
   res.redirect("/urls");
 });
@@ -149,7 +159,7 @@ app.post("/urls", (req, res) => {
   // If user is logged in, check if form is filled
   const longURL = req.body.longURL;
   if (!longURL) {
-    res.send("Please enter the webpage you would like to shorten")
+    res.send("Please enter the webpage you would like to shorten");
   }
   // Update the URL entry in the database
   const shortURL = helpers.generateRandomString(6);
@@ -166,9 +176,13 @@ app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.send("Please fill out login details");
   }
-    // get user data object with getUserByEmail function call
-    const userData = helpers.getUserByEmail(req.body.email, users);
+  // get user data object with getUserByEmail function call
+  const userData = helpers.getUserByEmail(req.body.email, users);
   // get users data
+  if (!userData) {
+    // if no user found, return error
+  return res.status(401).send('Unauthorized: Email Not Found');
+  }
   const loggedUser = userData.id;
   // check that there is a user in user database
   if (loggedUser) {
@@ -184,8 +198,6 @@ app.post("/login", (req, res) => {
       return res.status(403).send('Forbidden: Email/Passwords do not match');
     }
   }
-  // if no user found, return error
-  return res.status(401).send('Unauthorized: Email Not Found');
 });
 
 app.post("/logout", (req, res) => {
@@ -233,13 +245,9 @@ app.post("/urls/:id/", (req, res) => {
   //update database
   const newLongURL = req.body.editURL;
   urlDatabase[shortURL].longURL = newLongURL;
-    res.redirect("/urls");
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`app listening on port ${PORT}!`);
 });
