@@ -41,7 +41,7 @@ TinyApp was developed so that I can practice server side creations and implement
 `node express_server.js`
 
 
-- If you would like to build and add on this development. Nodemon will run and restart with each change made to 'express_server.js'
+- If you would like to build and add on this development. You can input the following command and nodemon will run and restart with each change you make.
 
 `npm start`
 
