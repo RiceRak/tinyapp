@@ -4,6 +4,9 @@ const express = require("express");
 const cookieSession = require("cookie-session");
 const app = express();
 const PORT = 8080;
+const data = require("./database")
+const users = data.users;
+const urlDatabase = data.urlDatabase;
 
 
 app.set("view engine", "ejs");
@@ -15,25 +18,6 @@ const cookieSessionConfig = cookieSession({
 });
 
 app.use(cookieSessionConfig);
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "j8iKhBnj",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "j8iKhBnj",
-  },
-};
-
-const users = {
-  j8iKhBnj: {
-    id: "j8iKhBnj",
-    email: "user@email.com",
-    password: "password",
-  },
-};
 
 // GET
 
@@ -50,7 +34,7 @@ app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   // check if a cookie session is active/user is logged in
   if (!user) {
-    return res.render("error");
+    return res.status(401).send("Unauthorized: Please log in to view URL's")
   }
   // if user is logged in, pass 'urls_index' data to render
   const urlsForUser = helpers.urlsForUser(user.id, urlDatabase);
@@ -105,7 +89,7 @@ app.get("/urls/:id", (req, res) => {
   const urlSearch = urlDatabase[shortURL];
   
   if(!user) {
-    return res.render("error");
+    return res.status(401).send("Unauthorized: Please log in to view URL's")
   }
   //check if short URL exists
   if (!urlSearch) {
@@ -114,7 +98,7 @@ app.get("/urls/:id", (req, res) => {
   // check if user owns URL
   const userURLs = helpers.urlsForUser(user.id, urlDatabase);
   if (!userURLs[shortURL]) {
-    return res.send('You do not have permission to view this URL');
+    return res.status(401).send('You do not have permission to view this URL');
   }
   const templateVars = {
     id: shortURL,
@@ -129,7 +113,7 @@ app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id
   const url = urlDatabase[shortURL]
   if (!url) {
-    return res.send('Short URL does not exist');
+    return res.status(400).send('Short URL does not exist');
   }
   res.redirect(url.longURL);
 });
@@ -171,7 +155,7 @@ app.post("/urls", (req, res) => {
   // If user is logged in, check if form is filled
   const longURL = req.body.longURL;
   if (!longURL) {
-    res.send("Please enter the webpage you would like to shorten");
+    res.status(400).send("Please enter the webpage you would like to shorten");
   }
   // Update the URL entry in the database
   const shortURL = helpers.generateRandomString(6);
@@ -186,7 +170,7 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   // validate user inputs
   if (!req.body.email || !req.body.password) {
-    return res.send("Please fill out login details");
+    return res.status(400).send("Please fill out login details");
   }
   // get user data object with getUserByEmail function call
   const userData = helpers.getUserByEmail(req.body.email, users);
@@ -204,11 +188,9 @@ app.post("/login", (req, res) => {
       req.session.user_id = userData.id;
       // show the user their URLs
       return res.redirect("/urls");
-   
-    } else {
+    }
       // if user id does not exist in database
       return res.status(403).send('Forbidden: Email/Passwords do not match');
-    }
   }
 });
 
@@ -252,7 +234,7 @@ app.post("/urls/:id/", (req, res) => {
 
   //check if short URL exists
   if (!urlDatabase[shortURL]) {
-    return res.send("Short URL not found");
+    return res.status(400).send("Short URL not found");
   }
   //update database
   const newLongURL = req.body.editURL;
