@@ -36,9 +36,15 @@ TinyApp was developed so that I can practice server side creations and implement
 - Install dependencies
 
 `npm install`
-- Start your server
+- Start your server (To use app)
 
 `node express_server.js`
+
+
+- If you would like to build and add on this development. Nodemon will run and restart with each change made to 'express_server.js'
+
+`npm start`
+
 - You should see that your server is "app listening on port 8080!" (you can set a port that you desire inside the express_server.js file if you wish, default is 8080).
 - Open your browser and visit "http://localhost:8080/register"
 - Register with your email and a secure password and you will be taken to your URL's. Notice you do not have an saved? Click "Create New URL" in the header and begin your shrinking journey!
