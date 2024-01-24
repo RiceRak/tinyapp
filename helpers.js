@@ -1,12 +1,15 @@
+// function to match input email to email's in database
 const getUserByEmail = function(email, users) {
   for (const userId in users) {
     if (users[userId].email === email) {
+      // return the entire user object so that it can be used appropriately
       return users[userId];
     }
   }
   return null;
 };
 
+// funtion to gather all of the users unique URL list
 const urlsForUser = function(id, urlDatabase) {
   const userURLs = {};
   for (const shortURL in urlDatabase) {
@@ -17,6 +20,7 @@ const urlsForUser = function(id, urlDatabase) {
   return userURLs;
 };
 
+// function to generate random strings for the converted URL and to create users ID upon registration
 const generateRandomString = function(length) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   let result = "";
