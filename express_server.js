@@ -37,11 +37,20 @@ const users = {
 
 // GET
 
+app.get("/", (req, res) => {
+  const user = users[req.session.user_id]
+  if (!user) {
+    return res.redirect("/login");
+  }
+  res.redirect("/urls");
+
+})
+
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   // check if a cookie session is active/user is logged in
   if (!user) {
-    return res.redirect("/login");
+    return res.render("error");
   }
   // if user is logged in, pass 'urls_index' data to render
   const urlsForUser = helpers.urlsForUser(user.id, urlDatabase);
@@ -94,6 +103,10 @@ app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = req.params.id;
   const urlSearch = urlDatabase[shortURL];
+  
+  if(!user) {
+    return res.render("error");
+  }
   //check if short URL exists
   if (!urlSearch) {
     return res.send('Short URL does not exist');
@@ -104,11 +117,7 @@ app.get("/urls/:id", (req, res) => {
     return res.send('You do not have permission to view this URL');
   }
   
-  const templateVars = {
-    id: shortURL,
-    longURL: urlSearch.longURL,
-    user,
-  };
+
   // show the user their page
   res.render("urls_show", templateVars);
 });
