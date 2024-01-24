@@ -116,8 +116,11 @@ app.get("/urls/:id", (req, res) => {
   if (!userURLs[shortURL]) {
     return res.send('You do not have permission to view this URL');
   }
-  
-
+  const templateVars = {
+    urls: urlDatabase,
+    user,
+    userURLs,
+  };
   // show the user their page
   res.render("urls_show", templateVars);
 });
