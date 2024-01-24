@@ -117,9 +117,9 @@ app.get("/urls/:id", (req, res) => {
     return res.send('You do not have permission to view this URL');
   }
   const templateVars = {
-    urls: urlDatabase,
+    id: shortURL,
+    longURL: urlSearch.longURL,
     user,
-    userURLs,
   };
   // show the user their page
   res.render("urls_show", templateVars);
